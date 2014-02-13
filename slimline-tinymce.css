@@ -1,0 +1,13 @@
+/**
+ * CSS Styles
+ *
+ * Minimal css styling for WP Editor
+ *
+ * @package Slimline Term and User TinyMCE
+ * @subpackage Stylesheet
+ */
+
+#wp-description-wrap #qt_description_toolbar .ed_button,
+#wp-tag-description-wrap #qt_tag-description_toolbar .ed_button {
+	width: auto;
+}

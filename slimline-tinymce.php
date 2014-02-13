@@ -20,7 +20,7 @@
  *
  * @package Slimline
  * @subpackage Term and User TinyMCE
- * @version 0.1.0
+ * @version 0.1.2
  * @author Michael Dozark <michael@michaeldozark.com>
  * @copyright Copyright (c) 2014, Michael Dozark
  * @link http://www.michaeldozark.com/wordpress/slimline/term-user-tinymce/
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // exit if accessed directly
 /**
  * Initialize plugin. This should be the only instance of add_action() outside of a defined function.
  */
-add_action( 'wp', 'slimline_tinymce_core' );
+add_action( 'wp_loaded', 'slimline_tinymce_core' );
 
 /**
  * slimline_tinymce_core function
@@ -48,8 +48,9 @@ function slimline_tinymce_core() {
 
 	remove_filter( 'pre_user_description', 'wp_filter_kses' );
 
+	add_action( 'admin_enqueue_scripts', 'slimline_tinymce_admin_enqueue_scripts' ); // enqueue styles to fix wp editor on term and user pages
 	add_action( 'edit_user_profile', 'slimline_tinymce_descriptions', 0 ); // replace default description textarea with a TinyMCE editor
-	add_action( 'load-edit-tags.php', 'slimline_add_term_tinymce', 0 ); // add filters to edit-tags page
+	add_action( 'load-edit-tags.php', 'slimline_add_term_tinymce' ); // add filters to edit-tags page
 	add_action( 'personal_options', 'slimline_ob_start', 0 ); // begin object buffering for profile description
 	add_action( 'show_user_profile', 'slimline_tinymce_descriptions', 0 ); // replace default description textarea with a TinyMCE editor
 
@@ -79,6 +80,18 @@ function slimline_add_term_tinymce() {
 	add_action( "{$taxonomy}_add_form_fields", 'slimline_tinymce_descriptions', 0 );
 	add_action( "{$taxonomy}_pre_edit_form", 'slimline_ob_start', 0 );
 	add_action( "{$taxonomy}_edit_form_fields", 'slimline_tinymce_descriptions', 0 );
+}
+
+/**
+ * slimline_tinymce_admin_enqueue_scripts function
+ *
+ * Enqueues styles to keep quicktags from stretching too wide in the WP Editor.
+ *
+ * @since 0.1.2
+ */
+function slimline_tinymce_admin_enqueue_scripts() {
+
+	wp_enqueue_style( 'slimline-tinymce', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'slimline-tinymce.min.css', false, '0.1.0', 'all' );
 }
 
 /**
