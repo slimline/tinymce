@@ -5,7 +5,7 @@
  * Description: Adds TinyMCE editor to Term Descriptions and User Bios
  * Author: Michael Dozark
  * Author URI: http://www.michaeldozark.com/
- * Version: 0.1.0
+ * Version: 0.1.3
  * License: GPL2
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU 
@@ -136,7 +136,7 @@ function slimline_tinymce_descriptions( $object ) {
 			$description_text = get_the_author_meta( 'description', $object->ID );
 
 		} else { // if ( is_a( $object, 'WP_User' ) )
-			$description_text = get_term_field( 'description', $object->ID, $object->taxonomy, 'raw' );
+			$description_text = get_term_field( 'description', $object->term_id, $object->taxonomy, 'raw' );
 
 		} // if ( is_a( $object, 'WP_User' ) )
 
