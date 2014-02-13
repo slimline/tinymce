@@ -46,10 +46,14 @@ function slimline_tinymce_core() {
 	if ( ! is_admin() )
 		return; // stop processing if not in the dashboard
 
+	remove_filter( 'pre_user_description', 'wp_filter_kses' );
+
 	add_action( 'edit_user_profile', 'slimline_tinymce_descriptions', 0 ); // replace default description textarea with a TinyMCE editor
 	add_action( 'load-edit-tags.php', 'slimline_add_term_tinymce', 0 ); // add filters to edit-tags page
 	add_action( 'personal_options', 'slimline_ob_start', 0 ); // begin object buffering for profile description
 	add_action( 'show_user_profile', 'slimline_tinymce_descriptions', 0 ); // replace default description textarea with a TinyMCE editor
+
+	add_filter( 'pre_user_description', 'michaeldozark_wp_filter_kses' );
 }
 
 
@@ -138,3 +142,18 @@ function slimline_tinymce_descriptions( $object ) {
 	echo preg_replace( '#<textarea name="description"([^>]+)>(.*)</textarea>#is', $wp_editor, $form_fields );
 }
 
+/**
+ * michaeldozark_wp_filter_kses function
+ *
+ * Replacement for wp_filter_kses that accepts the same HTML tags as are allowed for posts
+ *
+ * @param string $data HTML markup to filter
+ * @return string HTML markup filtered through wp_kses()
+ * @since 0.1.2
+ * @uses wp_kses()
+ * @uses wp_kses_allowed_html()
+ */
+function michaeldozark_wp_filter_kses( $data ) {
+
+	return addslashes( wp_kses( stripslashes( $data ), wp_kses_allowed_html( 'post' ) ) );
+}
