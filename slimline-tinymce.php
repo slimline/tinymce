@@ -146,7 +146,7 @@ function slimline_tinymce_descriptions( $object ) {
 	 * Use the object buffer to get the wp_editor markup
 	 */
 	ob_start();
-	wp_editor( $description_text, $description_id ); // @see http://codex.wordpress.org/Function_Reference/wp_editor
+	wp_editor( $description_text, $description_id, array( 'textarea_name' => 'description' ) ); // @see http://codex.wordpress.org/Function_Reference/wp_editor
 	$wp_editor = ob_get_clean();
 
 	/**
