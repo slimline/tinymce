@@ -20,7 +20,7 @@
  *
  * @package Slimline
  * @subpackage Term and User TinyMCE
- * @version 0.1.2
+ * @version 0.1.3
  * @author Michael Dozark <michael@michaeldozark.com>
  * @copyright Copyright (c) 2014, Michael Dozark
  * @link http://www.michaeldozark.com/wordpress/slimline/term-user-tinymce/
@@ -54,7 +54,7 @@ function slimline_tinymce_core() {
 	add_action( 'personal_options', 'slimline_ob_start', 0 ); // begin object buffering for profile description
 	add_action( 'show_user_profile', 'slimline_tinymce_descriptions', 0 ); // replace default description textarea with a TinyMCE editor
 
-	add_filter( 'pre_user_description', 'michaeldozark_wp_filter_kses' );
+	add_filter( 'pre_user_description', 'slimline_wp_filter_kses' );
 }
 
 
@@ -156,7 +156,7 @@ function slimline_tinymce_descriptions( $object ) {
 }
 
 /**
- * michaeldozark_wp_filter_kses function
+ * slimline_wp_filter_kses function
  *
  * Replacement for wp_filter_kses that accepts the same HTML tags as are allowed for posts
  *
@@ -166,7 +166,7 @@ function slimline_tinymce_descriptions( $object ) {
  * @uses wp_kses()
  * @uses wp_kses_allowed_html()
  */
-function michaeldozark_wp_filter_kses( $data ) {
+function slimline_wp_filter_kses( $data ) {
 
 	return addslashes( wp_kses( stripslashes( $data ), wp_kses_allowed_html( 'post' ) ) );
 }
