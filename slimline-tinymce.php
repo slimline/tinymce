@@ -5,17 +5,17 @@
  * Description: Adds TinyMCE editor to Term Descriptions and User Bios
  * Author: Michael Dozark
  * Author URI: http://www.michaeldozark.com/
- * Version: 0.3.0
+ * Version: 0.3.1
  * License: GPL2
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the GNU 
- * General Public License version 2.0, as published by the Free Software Foundation.  You may NOT assume 
+ * This program is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License version 2.0, as published by the Free Software Foundation.  You may NOT assume
  * that you can use any other version of the GPL.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * You should have received a copy of the GNU General Public License along with this program; if not, write 
+ * You should have received a copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * @package Slimline
@@ -32,7 +32,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // exit if accessed directly
 /**
  * Call initialization function.
  *
- * @see https://developer.wordpress.org/reference/hooks/plugins_loaded/ Documentation of plugins_loaded hook
+ * @see https://developer.wordpress.org/reference/hooks/plugins_loaded/
+ *      `Documentation of plugins_loaded hook`
  */
 add_action( 'plugins_loaded', 'slimline_tinymce' );
 
@@ -110,11 +111,11 @@ function slimline_add_term_tinymce() {
 	 *
 	 * By default, any user who can edit categories can also use TinyMCE in term descriptions.
 	 * This is redundant since those users are also the only ones who can access the edit-tags.php
-	 * page, but use of the filter allows developers to create more stringent or varied rules if 
+	 * page, but use of the filter allows developers to create more stringent or varied rules if
 	 * they choose.
 	 *
-	 * @param bool Whether or not the current user is allowed to use the TinyMCE Editor for tern 
-	 *             description. Defaults to TRUE is the user can manage categories, FALSE if they cannot.
+	 * @param bool Whether or not the current user is allowed to use the TinyMCE Editor for term
+	 *             descriptions. Defaults to TRUE is the user can manage categories, FALSE if they cannot.
 	 * @see https://codex.wordpress.org/Roles_and_Capabilities#manage_categories Description of manage_categories capability
 	 * @since 0.3.0
 	 */
@@ -123,11 +124,23 @@ function slimline_add_term_tinymce() {
 	if ( $add_term_tinymce ) {
 
 		/**
+		 * Remove default term description filter.
+		 *
+		 * The default wp_filter_kses for term descriptions strips most HTML content,
+		 * rendering the TinyMCE editor useless. We will add the same HTML filter as
+		 * is used with posts later.
+		 *
+		 * @link https://developer.wordpress.org/reference/hooks/pre_term_description/
+		 *       Description of `pre_term_description` filter
+		 */
+		remove_filter( 'pre_term_description', 'wp_filter_kses' );
+
+		/**
 		 * Start output buffering for add term form
 		 *
 		 * @see https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/ Documentation of {$taxnow}_pre_add_form hook
 		 */
-		add_action( "{$taxnow}_pre_add_form", 'slimline_tinymce_ob_start', 0 );
+		add_action( "{$taxnow}_pre_add_form", 'slimline_tinymce_ob_start', 1000 );
 
 		/**
 		 * Complete buffering and output content for add term form
@@ -141,7 +154,7 @@ function slimline_add_term_tinymce() {
 		 *
 		 * @see https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/ Documentation of {$taxnow}_pre_edit_form hook
 		 */
-		add_action( "{$taxnow}_pre_edit_form", 'slimline_tinymce_ob_start', 0 );
+		add_action( "{$taxnow}_pre_edit_form", 'slimline_tinymce_ob_start', 1000 );
 
 		/**
 		 * Complete buffering and output content for edit term form
@@ -150,6 +163,14 @@ function slimline_add_term_tinymce() {
 		 */
 		add_action( "{$taxnow}_edit_form_fields", 'slimline_tinymce_output_wp_editor', 0 );
 
+		/**
+		 * Add posts HTML filter to term descriptions.
+		 *
+		 * @link https://developer.wordpress.org/reference/hooks/pre_term_description/
+		 *       Documentation of `pre_term_description` filter
+		 */
+		add_filter( 'pre_term_description', 'slimline_wp_filter_kses' );
+
 	} // if ( $add_term_tinymce )
 
 }
@@ -157,7 +178,7 @@ function slimline_add_term_tinymce() {
 /**
  * Init TinyMCE hooks for user pages.
  *
- * Adds the action hooks for replacing the bio / user description textarea with a TinyMCE 
+ * Adds the action hooks for replacing the bio / user description textarea with a TinyMCE
  * editor. Using a separate function allows us to dynamically add the hooks based on user
  * capabilities.
  *
@@ -170,7 +191,7 @@ function slimline_add_user_tinymce() {
 	 *
 	 * By default, only users who can contribute to the site are allowed to use HTML in user bios
 	 *
-	 * @param bool Whether or not the current user is allowed to use the TinyMCE Editor for user 
+	 * @param bool Whether or not the current user is allowed to use the TinyMCE Editor for user
 	 *             bios. Defaults to TRUE is the user can also edit posts, FALSE if they cannot.
 	 * @see https://codex.wordpress.org/Roles_and_Capabilities#edit_posts Description of edit_posts capability
 	 * @since 0.3.0
@@ -201,7 +222,7 @@ function slimline_add_user_tinymce() {
 		 *
 		 * @see https://developer.wordpress.org/reference/hooks/personal_options/ Documentation of personal_options hook
 		 */
-		add_action( 'personal_options', 'slimline_tinymce_ob_start', 0 );
+		add_action( 'personal_options', 'slimline_tinymce_ob_start', 1000 );
 
 		/**
 		 * replace default description textarea with a TinyMCE editor
@@ -344,7 +365,7 @@ function slimline_tinymce_output_wp_editor( $object ) {
 /**
  * Replacement for wp_filter_kses that accepts the same HTML tags as are allowed for posts
  *
- * @param string $data HTML markup to filter for user content (slashed -- must 
+ * @param string $data HTML markup to filter for user content (slashed -- must
  *                     stripslashes to edit then re-add slashes before returning)
  * @return string HTML markup filtered through wp_kses()
  * @see https://developer.wordpress.org/reference/functions/wp_kses/ Documentation of wp_kses function
