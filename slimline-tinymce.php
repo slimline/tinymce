@@ -19,7 +19,7 @@
  * to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * @package    Slimline / Term and User TinyMCE
- * @version    0.3.0
+ * @version    0.3.1
  * @author     Michael Dozark <michael@michaeldozark.com>
  * @copyright  Copyright (c) 2016, Michael Dozark
  * @link       http://www.michaeldozark.com/wordpress/slimline/term-user-tinymce/
@@ -137,6 +137,18 @@ function slimline_add_term_tinymce() {
 	if ( $add_term_tinymce ) {
 
 		/**
+		 * Remove default term description filter.
+		 *
+		 * The default wp_filter_kses for term descriptions strips most HTML content,
+		 * rendering the TinyMCE editor useless. We will add the same HTML filter as
+		 * is used with posts later.
+		 *
+		 * @link https://developer.wordpress.org/reference/hooks/pre_term_description/
+		 *       Description of `pre_term_description` filter
+		 */
+		remove_filter( 'pre_term_description', 'wp_filter_kses' );
+
+		/**
 		 * Start output buffering for add term form
 		 *
 		 * We force passing 0 parameters to prevent setting ob_start's callback
@@ -173,6 +185,14 @@ function slimline_add_term_tinymce() {
 		 *       Documentation of `{$taxnow}_edit_form_fields` hook
 		 */
 		add_action( "{$taxnow}_edit_form_fields", 'slimline_tinymce_output_wp_editor', 0 );
+
+		/**
+		 * Add posts HTML filter to term descriptions.
+		 *
+		 * @link https://developer.wordpress.org/reference/hooks/pre_term_description/
+		 *       Documentation of `pre_term_description` filter
+		 */
+		add_filter( 'pre_term_description', 'slimline_wp_filter_kses' );
 
 	} // if ( $add_term_tinymce )
 
