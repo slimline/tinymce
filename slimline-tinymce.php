@@ -5,7 +5,7 @@
  * Description: Adds TinyMCE editor to Term Descriptions and User Bios
  * Author: Michael Dozark
  * Author URI: http://www.michaeldozark.com/
- * Version: 0.3.0
+ * Version: 0.3.1
  * License: GPL2
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU
