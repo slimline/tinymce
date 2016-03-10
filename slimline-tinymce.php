@@ -8,23 +8,22 @@
  * Version: 0.3.0
  * License: GPL2
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the GNU 
- * General Public License version 2.0, as published by the Free Software Foundation.  You may NOT assume 
+ * This program is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License version 2.0, as published by the Free Software Foundation.  You may NOT assume
  * that you can use any other version of the GPL.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * You should have received a copy of the GNU General Public License along with this program; if not, write 
+ * You should have received a copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * @package Slimline
- * @subpackage Term and User TinyMCE
- * @version 0.3.0
- * @author Michael Dozark <michael@michaeldozark.com>
- * @copyright Copyright (c) 2015, Michael Dozark
- * @link http://www.michaeldozark.com/wordpress/slimline/term-user-tinymce/
- * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * @package    Slimline / Term and User TinyMCE
+ * @version    0.3.0
+ * @author     Michael Dozark <michael@michaeldozark.com>
+ * @copyright  Copyright (c) 2016, Michael Dozark
+ * @link       http://www.michaeldozark.com/wordpress/slimline/term-user-tinymce/
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // exit if accessed directly
@@ -32,21 +31,24 @@ if ( ! defined( 'ABSPATH' ) ) exit; // exit if accessed directly
 /**
  * Call initialization function.
  *
- * @see https://developer.wordpress.org/reference/hooks/plugins_loaded/ Documentation of plugins_loaded hook
+ * @link https://developer.wordpress.org/reference/hooks/plugins_loaded/
+ *       Documentation of `plugins_loaded` hook
  */
 add_action( 'plugins_loaded', 'slimline_tinymce' );
 
 /**
  * Initialize plugin
  *
+ * @link  https://github.com/slimline/tinymce/wiki/slimline_tinymce()
  * @since 0.1.0
  */
 function slimline_tinymce() {
 
 	/**
-	 * stop initialization if not in the dashboard
+	 * Stop initialization if not in the dashboard
 	 *
-	 * @see https://developer.wordpress.org/reference/functions/is_admin/ Documentation of is_admin function
+	 * @link https://developer.wordpress.org/reference/functions/is_admin/
+	 *       Documentation of `is_admin` function
 	 */
 	if ( ! is_admin() ) {
 		return;
@@ -55,31 +57,36 @@ function slimline_tinymce() {
     /**
      * Enqueue styles to fix wp editor on term and user pages
      *
-     * The term and user pages include styles that cause quicktag buttons to span the full width of the editor.
-     * We will load some CSS to fix that by setting them to width "auto".
+     * The term and user pages include styles that cause quicktag buttons to span the
+     * full width of the editor. We will load some CSS to fix that by setting them to
+     * width "auto".
      *
-     * @see https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/ Documentation of admin_enqueue_scripts hook
+     * @link https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/
+     *       Documentation of `admin_enqueue_scripts` hook
      */
 	add_action( 'admin_enqueue_scripts', 'slimline_tinymce_admin_enqueue_scripts' );
 
 	/**
-	 * add filters to edit-tags page
+	 * Add filters to edit-tags page
 	 *
-	 * @see https://developer.wordpress.org/reference/hooks/load-plugin_page/ Documentation of load-{$plugin_page} hook
+	 * @link https://developer.wordpress.org/reference/hooks/load-plugin_page/
+	 *       Documentation of `load-{$plugin_page}` hook
 	 */
 	add_action( 'load-edit-tags.php', 'slimline_add_term_tinymce' );
 
 	/**
-	 * add filters to profile page
+	 * Add filters to profile page
 	 *
-	 * @see https://developer.wordpress.org/reference/hooks/load-plugin_page/ Documentation of load-{$plugin_page} hook
+	 * @link https://developer.wordpress.org/reference/hooks/load-plugin_page/
+	 *       Documentation of `load-{$plugin_page}` hook
 	 */
 	add_action( 'load-profile.php', 'slimline_add_user_tinymce' );
 
 	/**
-	 * add filters to user-edit page
+	 * Add filters to user-edit page
 	 *
-	 * @see https://developer.wordpress.org/reference/hooks/load-plugin_page/ Documentation of load-{$plugin_page} hook
+	 * @link https://developer.wordpress.org/reference/hooks/load-plugin_page/
+	 *       Documentation of `load-{$plugin_page}` hook
 	 */
 	add_action( 'load-user-edit.php', 'slimline_add_user_tinymce' );
 
@@ -89,17 +96,22 @@ function slimline_tinymce() {
 /**
  * Init TinyMCE hooks for taxonomy pages.
  *
- * Adds the action hooks for replacing the term description textarea with a TinyMCE editor.
- * Using a separate function allows us to dynamically add the hooks to all taxonomies.
+ * Adds the action hooks for replacing the term description textarea with a TinyMCE
+ * editor. Using a separate function allows us to dynamically add the hooks to all
+ * taxonomies.
  *
- * @global string $taxnow The taxonomy slug for the current term
+ * @link  https://github.com/slimline/tinymce/wiki/slimline_add_term_tinymce()
  * @since 0.1.0
  */
 function slimline_add_term_tinymce() {
+
+	/**
+	 * @global string $taxnow The taxonomy slug for the current term
+	 */
 	global $taxnow;
 
 	/**
-	 * exit function if taxonomy not set
+	 * Exit function if taxonomy not set
 	 */
 	if ( ! $taxnow ) {
 		return;
@@ -108,14 +120,16 @@ function slimline_add_term_tinymce() {
 	/**
 	 * Filter which users are allowed to use TinyMCE for term descriptions
 	 *
-	 * By default, any user who can edit categories can also use TinyMCE in term descriptions.
-	 * This is redundant since those users are also the only ones who can access the edit-tags.php
-	 * page, but use of the filter allows developers to create more stringent or varied rules if 
-	 * they choose.
+	 * By default, any user who can edit categories can also use TinyMCE in term
+	 * descriptions. This is redundant since those users are also the only ones who
+	 * can access the edit-tags.php page, but use of the filter allows developers to
+	 * create more stringent or varied rules if they choose.
 	 *
-	 * @param bool Whether or not the current user is allowed to use the TinyMCE Editor for tern 
-	 *             description. Defaults to TRUE is the user can manage categories, FALSE if they cannot.
-	 * @see https://codex.wordpress.org/Roles_and_Capabilities#manage_categories Description of manage_categories capability
+	 * @param bool Whether or not the current user is allowed to use the TinyMCE
+	 *             Editor for term descriptions. Defaults to TRUE if the user can
+	 *             manage categories, FALSE if they cannot.
+	 * @link  https://codex.wordpress.org/Roles_and_Capabilities#manage_categories
+	 *        Description of `manage_categories` capability
 	 * @since 0.3.0
 	 */
 	$add_term_tinymce = apply_filters( 'slimline_add_term_tinymce', current_user_can( 'manage_categories' ) );
@@ -125,28 +139,38 @@ function slimline_add_term_tinymce() {
 		/**
 		 * Start output buffering for add term form
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/ Documentation of {$taxnow}_pre_add_form hook
+		 * We force passing 0 parameters to prevent setting ob_start's callback
+		 * parameter.
+		 *
+		 * @link https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/
+		 *       Documentation of `{$taxnow}_pre_add_form` hook
 		 */
-		add_action( "{$taxnow}_pre_add_form", 'slimline_tinymce_ob_start', 0 );
+		add_action( "{$taxnow}_pre_add_form", 'ob_start', 1000, 0 );
 
 		/**
 		 * Complete buffering and output content for add term form
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/ Documentation of {$taxnow}_add_form_fields hook
+		 * @link https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/
+		 *       Documentation of `{$taxnow}_add_form_fields` hook
 		 */
 		add_action( "{$taxnow}_add_form_fields", 'slimline_tinymce_output_wp_editor', 0 );
 
 		/**
 		 * Start output buffering for edit term form
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/ Documentation of {$taxnow}_pre_edit_form hook
+		 * We force passing 0 parameters to prevent setting ob_start's callback
+		 * parameter.
+		 *
+		 * @link https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/
+		 *       Documentation of `{$taxnow}_pre_edit_form` hook
 		 */
-		add_action( "{$taxnow}_pre_edit_form", 'slimline_tinymce_ob_start', 0 );
+		add_action( "{$taxnow}_pre_edit_form", 'ob_start', 1000, 0 );
 
 		/**
 		 * Complete buffering and output content for edit term form
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/ Documentation of {$taxnow}_edit_form_fields hook
+		 * @link https://developer.wordpress.org/reference/hooks/taxonomy_pre_add_form/
+		 *       Documentation of `{$taxnow}_edit_form_fields` hook
 		 */
 		add_action( "{$taxnow}_edit_form_fields", 'slimline_tinymce_output_wp_editor', 0 );
 
@@ -157,10 +181,11 @@ function slimline_add_term_tinymce() {
 /**
  * Init TinyMCE hooks for user pages.
  *
- * Adds the action hooks for replacing the bio / user description textarea with a TinyMCE 
- * editor. Using a separate function allows us to dynamically add the hooks based on user
- * capabilities.
+ * Adds the action hooks for replacing the bio / user description textarea with a
+ * TinyMCE editor. Using a separate function allows us to dynamically add the hooks
+ * based on user capabilities.
  *
+ * @link  https://github.com/slimline/tinymce/wiki/slimline_add_user_tinymce()
  * @since 0.2.0
  */
 function slimline_add_user_tinymce() {
@@ -168,11 +193,14 @@ function slimline_add_user_tinymce() {
 	/**
 	 * Filter which users are allowed to use TinyMCE for user bios
 	 *
-	 * By default, only users who can contribute to the site are allowed to use HTML in user bios
+	 * By default, only users who can contribute to the site are allowed to use HTML
+	 * in user bios.
 	 *
-	 * @param bool Whether or not the current user is allowed to use the TinyMCE Editor for user 
-	 *             bios. Defaults to TRUE is the user can also edit posts, FALSE if they cannot.
-	 * @see https://codex.wordpress.org/Roles_and_Capabilities#edit_posts Description of edit_posts capability
+	 * @param bool Whether or not the current user is allowed to use the TinyMCE
+	 *             Editor for user bios. Defaults to TRUE is the user can also edit
+	 *             posts, FALSE if they cannot.
+	 * @link  https://codex.wordpress.org/Roles_and_Capabilities#edit_posts
+	 *        Description of `edit_posts` capability
 	 * @since 0.3.0
 	 */
 	$add_user_tinymce = apply_filters( 'slimline_add_user_tinymce', current_user_can( 'edit_posts' ) );
@@ -182,38 +210,47 @@ function slimline_add_user_tinymce() {
 		/**
 		 * Remove default user description filter.
 		 *
-		 * The default wp_filter_kses for user descriptions strips most HTML content, rendering the TinyMCE editor
-		 * useless. We will add the same HTML filter as is used with posts later.
+		 * The default wp_filter_kses for user descriptions strips most HTML content,
+		 * rendering the TinyMCE editor useless. We will add the same HTML filter as
+		 * is used with posts later.
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/pre_user_description/ Documentation of pre_user_description filter
+		 * @link https://developer.wordpress.org/reference/hooks/pre_user_description/
+		 *       Documentation of `pre_user_description` filter
 		 */
 		remove_filter( 'pre_user_description', 'wp_filter_kses' );
 
 		/**
-		 * replace default description textarea with a TinyMCE editor
+		 * Replace default description textarea with a TinyMCE editor
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/edit_user_profile/ Documentation of edit_user_profile hook
+		 * @link https://developer.wordpress.org/reference/hooks/edit_user_profile/
+		 *       Documentation of `edit_user_profile` hook
 		 */
 		add_action( 'edit_user_profile', 'slimline_tinymce_output_wp_editor', 0 );
 
 		/**
-		 * begin output buffering for profile description
+		 * Begin output buffering for profile description
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/personal_options/ Documentation of personal_options hook
+		 * We force passing 0 parameters to prevent setting ob_start's callback
+		 * parameter.
+		 *
+		 * @link https://developer.wordpress.org/reference/hooks/personal_options/
+		 *       Documentation of `personal_options` hook
 		 */
-		add_action( 'personal_options', 'slimline_tinymce_ob_start', 0 );
+		add_action( 'personal_options', 'ob_start', 1000, 0 );
 
 		/**
-		 * replace default description textarea with a TinyMCE editor
+		 * Replace default description textarea with a TinyMCE editor
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/show_user_profile/ Documentation of show_user_profile hook
+		 * @link https://developer.wordpress.org/reference/hooks/show_user_profile/
+		 *       Documentation of `show_user_profile` hook
 		 */
 		add_action( 'show_user_profile', 'slimline_tinymce_output_wp_editor', 0 );
 
 		/**
 		 * Add posts HTML filter to user descriptions.
 		 *
-		 * @see https://developer.wordpress.org/reference/hooks/pre_user_description/ Documentation of pre_user_description filter
+		 * @link https://developer.wordpress.org/reference/hooks/pre_user_description/
+		 *       Documentation of `pre_user_description` filter
 		 */
 		add_filter( 'pre_user_description', 'slimline_wp_filter_kses' );
 
@@ -224,37 +261,31 @@ function slimline_add_user_tinymce() {
 /**
  * Enqueue custom admin styles and scripts.
  *
- * @see https://developer.wordpress.org/reference/functions/wp_enqueue_style/ Documentation of wp_enqueue_style function
- * @see https://developer.wordpress.org/reference/functions/trailingslashit/ Documentation of trailingslashit function
- * @see https://developer.wordpress.org/reference/functions/plugin_dir_url/ Documentation of plugin_dir_url function
+ * @link  https://github.com/slimline/tinymce/wiki/slimline_tinymce_admin_enqueue_scripts()
  * @since 0.1.2
  */
 function slimline_tinymce_admin_enqueue_scripts() {
 
 	/**
 	 * Enqueues styles to keep quicktags from stretching too wide in the WP Editor.
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/wp_enqueue_style/
+	 *       Documentation of `wp_enqueue_style` function
+	 * @link https://developer.wordpress.org/reference/functions/trailingslashit/
+	 *       Documentation of `trailingslashit` function
+	 * @link https://developer.wordpress.org/reference/functions/plugin_dir_url/
+	 *       Documentation of `plugin_dir_url` function
 	 */
 	wp_enqueue_style( 'slimline-tinymce', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'slimline-tinymce.min.css', false, '0.1.0', 'all' );
 }
 
 /**
- * Begin output buffering
+ * Replaces default taxonomy and profile description textareas with an instance of
+ * the TinyMCE editor.
  *
- * We cannot directly hook ob_start in actions because the hook parameters will be passed to the
- * function. Since the parameter is likely to be an object (e.g., WP_User, $taxonomy, etc.) this will
- * create a fatal error since ob_start expects a string as its first parameter.
- *
- * @since 0.1.0
- */
-function slimline_tinymce_ob_start() {
-
-	ob_start();
-}
-
-/**
- * Replaces default taxonomy and profile description textareas with an instance of the TinyMCE editor.
- *
- * @param object|string $object The term or user object being edited or the name of the taxonomy if on an add term screen.
+ * @param object|string $object The term or user object being edited or the name of
+ *                              the taxonomy if on an add term screen.
+ * @link  https://github.com/slimline/tinymce/wiki/slimline_tinymce_output_wp_editor()
  * @since 0.1.0
  */
 function slimline_tinymce_output_wp_editor( $object ) {
@@ -267,7 +298,8 @@ function slimline_tinymce_output_wp_editor( $object ) {
 	/**
 	 * Set up wp_editor parameters based on which screen we are on.
 	 *
-	 * @see https://developer.wordpress.org/reference/functions/current_filter/ Documentation of current_filter function
+	 * @link https://developer.wordpress.org/reference/functions/current_filter/
+	 *       Documentation of `current_filter` function
 	 */
 	if ( strpos( current_filter(), 'add' ) ) {
 
@@ -293,9 +325,10 @@ function slimline_tinymce_output_wp_editor( $object ) {
 	/**
 	 * Filter whether or not to show the media buttons
 	 *
-	 * @param bool Whether or not to include the TinyMCE media buttons. By default this is TRUE if the user
-	 *             can upload files, FALSE if not.
-	 * @see https://codex.wordpress.org/Roles_and_Capabilities#upload_files Description of upload_files capability
+	 * @param bool Whether or not to include the TinyMCE media buttons. By default
+	 *             this is TRUE if the user can upload files, FALSE if not.
+	 * @link  https://codex.wordpress.org/Roles_and_Capabilities#upload_files
+	 *        Description of `upload_files` capability
 	 * @since 0.3.0
 	 */
 	$media_buttons = apply_filters( 'slimline_tinymce_media_buttons', current_user_can( 'upload_files' ) );
@@ -303,9 +336,10 @@ function slimline_tinymce_output_wp_editor( $object ) {
 	/**
 	 * Filter wp_editor args
 	 *
-	 * @param array Arguments for the wp_editor function. By default this will contain only the media_buttons
-	 *              argument filtered previously.
-	 * @see https://developer.wordpress.org/reference/classes/_wp_editors/editor/ Description of editor arguments
+	 * @param array Arguments for the wp_editor function. By default this will
+	 *              contain only the media_buttons argument filtered previously.
+	 * @link  https://developer.wordpress.org/reference/classes/_wp_editors/editor/
+	 *        Description of editor arguments
 	 * @since 0.3.0
 	 */
 	$wp_editor_args = apply_filters( 'slimline_tinymce_editor_args', array( 'media_buttons' => $media_buttons ) );
@@ -318,15 +352,16 @@ function slimline_tinymce_output_wp_editor( $object ) {
 	/**
 	 * Use the output buffer to get the wp_editor markup
 	 *
-	 * We are buffering the contents because wp_editor is an echo-only function and we need to return it as
-	 * a string so we can do a preg_replace later.
+	 * We are buffering the contents because wp_editor is an echo-only function and
+	 * we need to return it as a string so we can do a preg_replace later.
 	 */
 	ob_start();
 
 	/**
 	 * create the WordPress Editor
 	 *
-	 * @see https://developer.wordpress.org/reference/functions/wp_editor/ Documentation of wp_editor function
+	 * @link https://developer.wordpress.org/reference/functions/wp_editor/
+	 *       Documentation of `wp_editor` function
 	 */
 	wp_editor( $description_text, $description_id, $wp_editor_args );
 
@@ -344,21 +379,26 @@ function slimline_tinymce_output_wp_editor( $object ) {
 /**
  * Replacement for wp_filter_kses that accepts the same HTML tags as are allowed for posts
  *
- * @param string $data HTML markup to filter for user content (slashed -- must 
- *                     stripslashes to edit then re-add slashes before returning)
- * @return string HTML markup filtered through wp_kses()
- * @see https://developer.wordpress.org/reference/functions/wp_kses/ Documentation of wp_kses function
- * @see https://developer.wordpress.org/reference/functions/wp_kses_allowed_html/ Documentation of wp_kses function
- * @since 0.1.2
+ * @param  string $data HTML markup to filter for user content (slashed -- must
+ *                      stripslashes to edit then re-add slashes before returning)
+ * @return string       HTML markup filtered through wp_kses()
+ * @link   https://github.com/slimline/tinymce/wiki/slimline_wp_filter_kses()
+ * @since  0.1.2
  */
 function slimline_wp_filter_kses( $data ) {
 
 	/**
 	 * wp_kses call
 	 *
-	 * @param string Content to filter through wp_kses (the un-slashed description content)
-	 * @param array Allowed HTML elements. Here we are retrieving the HTML elements allowed for posts.
-	 * 	            Users can filter this array using the `wp_kses_allowed_html` filter.
+	 * @param string Content to filter through wp_kses (the un-slashed description
+	 *               content)
+	 * @param array  Allowed HTML elements. Here we are retrieving the HTML elements
+	 *               allowed for posts. Users can filter this array using the
+	 *               `wp_kses_allowed_html` filter.
+	 * @link  https://developer.wordpress.org/reference/functions/wp_kses/
+	 *        Documentation of `wp_kses` function
+	 * @link  https://developer.wordpress.org/reference/functions/wp_kses_allowed_html/
+	 *        Documentation of `wp_kses` function
 	 */
 	return addslashes( wp_kses( stripslashes( $data ), wp_kses_allowed_html( 'post' ) ) );
 }
