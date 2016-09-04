@@ -418,7 +418,7 @@ function slimline_wp_filter_kses( $data ) {
 	 * @link  https://developer.wordpress.org/reference/functions/wp_kses/
 	 *        Documentation of `wp_kses` function
 	 * @link  https://developer.wordpress.org/reference/functions/wp_kses_allowed_html/
-	 *        Documentation of `wp_kses` function
+	 *        Documentation of `wp_kses_allowed_html` function
 	 */
 	return addslashes( wp_kses( stripslashes( $data ), wp_kses_allowed_html( 'post' ) ) );
 }
